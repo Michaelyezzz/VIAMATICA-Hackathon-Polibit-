@@ -148,7 +148,7 @@ class DatabaseManager:
         return especialidades
     
     def add_especialidad(self, id: str, nombre: str, codigo: str, costo_base: float,
-                        sintomas_clave: List[str] = None, descripcion: str = None):
+                         sintomas_clave: List[str] = None, descripcion: str = None):
         """Agregar nueva especialidad"""
         conn = self._get_connection()
         cursor = conn.cursor()
@@ -181,7 +181,7 @@ class DatabaseManager:
         return dict(row) if row else {}
     
     def add_plan_seguro(self, id: str, nombre: str, compania: str, cobertura_porcentaje: float,
-                       deducible: float = None, copago_fijo: float = None, descripcion: str = None):
+                        deducible: float = None, copago_fijo: float = None, descripcion: str = None):
         """Agregar nuevo plan de seguro"""
         conn = self._get_connection()
         cursor = conn.cursor()
@@ -213,7 +213,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         cursor.execute("""
             INSERT OR REPLACE INTO cobertura_especialidad 
-            (plan_id, especialidad_id, cubre_porcentaje, copago_especialidad)
+            (id, plan_id, especialidad_id, cubre_porcentaje, copago_especialidad)
             VALUES (?, ?, ?, ?)
         """, (plan_id, especialidad_id, cubre_porcentaje, copago_especialidad))
         conn.commit()
@@ -221,25 +221,31 @@ class DatabaseManager:
     
     # ========== UTILIDADES ==========
     def load_sample_data(self):
-        """Cargar datos de ejemplo"""
+        """Cargar datos de ejemplo reales de Ecuador"""
         # Hospitales
+        # Notas de corrección: 
+        # - El Metropolitano y Vozandes usan PBX unificado moderno (02-399-8000 y 02-400-7100).
+        # - Clínica Pichincha está en la calle Ulpiano Páez y Veintimilla.
+        # - Baca Ortiz es público (MSP), copago base de consulta externa es $0 por ley de gratuidad.
+        # - Copagos base privados configurados según los promedios de deducible por consulta de redes prepagadas.
         hospitales = [
-            ("hosp_001", "Hospital Metropolitano", "Red Premium", 25, "+593 2 398-6000", "Av. Mariana de Jesús", "Quito"),
-            ("hosp_002", "Hospital Voz Andes", "Red Plus", 20, "+593 2 226-0142", "Calle 38 y Avenida América", "Quito"),
-            ("hosp_003", "Clínica Pichincha", "Red Básica", 15, "+593 2 299-8000", "Avenida 10 de Agosto", "Quito"),
-            ("hosp_004", "Hospital Baca Ortiz", "Red Pública", 5, "+593 2 250-0666", "Correo del Pío", "Quito"),
+            ("hosp_001", "Hospital Metropolitano", "Red Premium", 25.0, "+593 2 399-8000", "Av. Mariana de Jesús y Nicolás Arteta S/N", "Quito"),
+            ("hosp_002", "Hospital Vozandes", "Red Plus", 15.0, "+593 2 400-7100", "Calle Veracruz N37-102 y Av. América", "Quito"),
+            ("hosp_003", "Hospital de Clínicas Pichincha", "Red Básica", 12.0, "+593 2 299-8700", "Gral. Ulpiano Páez N22-188 y Veintimilla", "Quito"),
+            ("hosp_004", "Hospital Pediátrico Baca Ortiz", "Red Pública", 0.0, "+593 2 394-2800", "Av. 6 de Diciembre S/N y Av. Cristóbal Colón", "Quito"),
         ]
         
         for hosp in hospitales:
             self.add_hospital(*hosp)
         
         # Especialidades
+        # Costos ajustados al mercado ecuatoriano (Med. General $35-$45, Especialistas privados $60-$80)
         especialidades = [
-            ("esp_001", "Medicina General", "MED_GEN", 50, ["dolor", "fiebre", "malestar"], "Consulta general"),
-            ("esp_002", "Cardiología", "CARD", 120, ["pecho", "corazón", "presión"], "Especialista del corazón"),
-            ("esp_003", "Dermatología", "DERM", 80, ["piel", "acné", "alergia"], "Especialista de la piel"),
-            ("esp_004", "Ginecología", "GIN", 100, ["ginecología", "reproductivo"], "Especialista femenino"),
-            ("esp_005", "Oftalmología", "OFT", 90, ["ojos", "visión", "vista"], "Especialista de los ojos"),
+            ("esp_001", "Medicina General", "MED_GEN", 40.0, ["dolor", "fiebre", "malestar"], "Consulta general"),
+            ("esp_002", "Cardiología", "CARD", 75.0, ["pecho", "corazón", "presión"], "Especialista del corazón"),
+            ("esp_003", "Dermatología", "DERM", 65.0, ["piel", "acné", "alergia"], "Especialista de la piel"),
+            ("esp_004", "Ginecología", "GIN", 70.0, ["ginecología", "reproductivo"], "Especialista femenino"),
+            ("esp_005", "Oftalmología", "OFT", 60.0, ["ojos", "visión", "vista"], "Especialista de los ojos"),
         ]
         
         for esp in especialidades:
@@ -247,9 +253,9 @@ class DatabaseManager:
         
         # Planes de seguro
         planes = [
-            ("plan_001", "Plan Básico", "Seguros XYZ", 60, 100, 15, "Cobertura básica"),
-            ("plan_002", "Plan Plus", "Seguros XYZ", 80, 50, 10, "Cobertura intermedia"),
-            ("plan_003", "Plan Premium", "Seguros XYZ", 95, 0, 5, "Cobertura completa"),
+            ("plan_001", "Plan Básico", "Seguros XYZ", 60.0, 100.0, 15.0, "Cobertura básica"),
+            ("plan_002", "Plan Plus", "Seguros XYZ", 80.0, 50.0, 10.0, "Cobertura intermedia"),
+            ("plan_003", "Plan Premium", "Seguros XYZ", 95.0, 0.0, 5.0, "Cobertura completa"),
         ]
         
         for plan in planes:
@@ -257,15 +263,15 @@ class DatabaseManager:
         
         # Cobertura por especialidad
         coberturas = [
-            ("plan_001", "esp_001", 100, 15),
-            ("plan_001", "esp_002", 60, 30),
-            ("plan_001", "esp_003", 70, 20),
-            ("plan_002", "esp_001", 100, 10),
-            ("plan_002", "esp_002", 80, 20),
-            ("plan_002", "esp_003", 90, 15),
-            ("plan_003", "esp_001", 100, 5),
-            ("plan_003", "esp_002", 100, 10),
-            ("plan_003", "esp_003", 100, 10),
+            ("plan_001", "esp_001", 100.0, 15.0),
+            ("plan_001", "esp_002", 60.0, 30.0),
+            ("plan_001", "esp_003", 70.0, 20.0),
+            ("plan_002", "esp_001", 100.0, 10.0),
+            ("plan_002", "esp_002", 80.0, 20.0),
+            ("plan_002", "esp_003", 90.0, 15.0),
+            ("plan_003", "esp_001", 100.0, 5.0),
+            ("plan_003", "esp_002", 100.0, 10.0),
+            ("plan_003", "esp_003", 100.0, 10.0),
         ]
         
         for cob in coberturas:
@@ -298,3 +304,5 @@ class DatabaseManager:
         cursor.execute("DELETE FROM hospitales")
         conn.commit()
         conn.close()
+
+```

@@ -29,79 +29,79 @@ class HospitalDataManager:
         return {}
     
     def _load_sample_hospitals(self) -> List[Dict]:
-        """Cargar datos de ejemplo de hospitales"""
+        """Cargar datos reales de hospitales en Ecuador (Quito)"""
         return [
             {
                 "id": "hosp_001",
                 "nombre": "Hospital Metropolitano",
                 "red": "Red Premium",
-                "copago_base": 25,
-                "telefono": "+593 2 398-6000",
-                "direccion": "Av. Mariana de Jesús, Quito"
+                "copago_base": 25.0,
+                "telefono": "+593 2 399-8000",
+                "direccion": "Av. Mariana de Jesús y Nicolás Arteta S/N, Quito"
             },
             {
                 "id": "hosp_002",
-                "nombre": "Hospital Voz Andes",
+                "nombre": "Hospital Vozandes",
                 "red": "Red Plus",
-                "copago_base": 20,
-                "telefono": "+593 2 226-0142",
-                "direccion": "Calle 38 y Avenida América, Quito"
+                "copago_base": 15.0,
+                "telefono": "+593 2 400-7100",
+                "direccion": "Calle Veracruz N37-102 y Av. América, Quito"
             },
             {
                 "id": "hosp_003",
-                "nombre": "Clínica Pichincha",
+                "nombre": "Hospital de Clínicas Pichincha",
                 "red": "Red Básica",
-                "copago_base": 15,
-                "telefono": "+593 2 299-8000",
-                "direccion": "Avenida 10 de Agosto, Quito"
+                "copago_base": 12.0,
+                "telefono": "+593 2 299-8700",
+                "direccion": "Gral. Ulpiano Páez N22-188 y Veintimilla, Quito"
             },
             {
                 "id": "hosp_004",
-                "nombre": "Hospital Baca Ortiz",
+                "nombre": "Hospital Pediátrico Baca Ortiz",
                 "red": "Red Pública",
-                "copago_base": 5,
-                "telefono": "+593 2 250-0666",
-                "direccion": "Correo del Pío, Quito"
+                "copago_base": 0.0,  # Gratuito por ley de la Red Pública Integral de Salud (MSP)
+                "telefono": "+593 2 394-2800",
+                "direccion": "Av. 6 de Diciembre S/N y Av. Cristóbal Colón, Quito"
             }
         ]
     
     def _load_sample_specialties(self) -> List[Dict]:
-        """Cargar datos de ejemplo de especialidades"""
+        """Cargar datos reales de especialidades y costos promedio del mercado privado ecuatoriano"""
         return [
             {
                 "nombre": "Medicina General",
                 "codigo": "MED_GEN",
-                "costo_base": 50,
+                "costo_base": 40.0,
                 "sintomas_clave": ["dolor", "fiebre", "malestar"]
             },
             {
                 "nombre": "Cardiología",
                 "codigo": "CARD",
-                "costo_base": 120,
+                "costo_base": 75.0,
                 "sintomas_clave": ["dolor de pecho", "arritmia", "presión alta"]
             },
             {
                 "nombre": "Traumatología",
                 "codigo": "TRAUMA",
-                "costo_base": 100,
+                "costo_base": 65.0,
                 "sintomas_clave": ["fractura", "esguince", "dolor articular"]
             },
             {
                 "nombre": "Gastroenterología",
                 "codigo": "GASTRO",
-                "costo_base": 90,
+                "costo_base": 70.0,
                 "sintomas_clave": ["dolor abdominal", "gastritis", "diarrea"]
             },
             {
                 "nombre": "Oftalmología",
                 "codigo": "OFTALMOLOGIA",
-                "costo_base": 80,
+                "costo_base": 60.0,
                 "sintomas_clave": ["visión borrosa", "dolor ocular", "conjuntivitis"]
             },
             {
                 "nombre": "Dermatología",
                 "codigo": "DERMA",
-                "costo_base": 75,
+                "costo_base": 65.0,
                 "sintomas_clave": ["erupción", "acné", "prurito"]
             }
         ]

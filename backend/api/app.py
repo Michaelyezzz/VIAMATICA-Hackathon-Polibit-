@@ -28,8 +28,9 @@ def create_app():
         response.headers['Expires'] = '0'
         return response
     
-    # Inicializar agente
-    agent = CopagoAgent()
+    # Inicializar agente de forma perezosa para evitar fallos en el arranque
+    # Se creará en la primera petición a /api/chat
+    app.agent = None
     
     # Rutas
     @app.route('/', methods=['GET'])
@@ -65,9 +66,22 @@ def create_app():
             if not user_message:
                 return jsonify({"error": "Mensaje vacío"}), 400
 
+            # Inicializar agente si no existe (lazy init)
+            if not getattr(app, 'agent', None):
+                try:
+                    app.agent = CopagoAgent()
+                except Exception as e:
+                    print(f"Error inicializando agente en /api/chat: {e}")
+                    traceback.print_exc()
+                    return jsonify({
+                        "status": "error",
+                        "message": "Error inicializando agente",
+                        "error": str(e)
+                    }), 500
+
             # Obtener respuesta del agente
             try:
-                response = agent.process_message(user_message)
+                response = app.agent.process_message(user_message)
             except Exception as e:
                 # Registrar y devolver una respuesta legible al frontend
                 print(f"Error en /api/chat: {str(e)}")
@@ -98,7 +112,11 @@ def create_app():
     @app.route('/api/reset', methods=['POST'])
     def reset():
         """Reiniciar conversación"""
-        agent.reset_conversation()
+        if getattr(app, 'agent', None):
+            app.agent.reset_conversation()
+        else:
+            # nothing to reset yet
+            pass
         return jsonify({"status": "success", "message": "Conversación reiniciada"}), 200
     
     # Error handler
